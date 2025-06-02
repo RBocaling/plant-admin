@@ -39,9 +39,10 @@ const LoginPage = () => {
   const { mutateAsync: loginMutate, isPending } = useMutation({
     mutationFn: loginApi,
     onSuccess: (data) => {
+      setTokens( data?.accessToken,  data?.refreshToken)
       alert("Success")
         navigate("/")
-        setTokens( data?.accessToken,  data?.refreshToken)
+        
     },
     onError: (error) => {
      alert("error")

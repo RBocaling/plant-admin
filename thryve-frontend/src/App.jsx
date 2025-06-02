@@ -32,7 +32,6 @@ import useUserAuth from "./hooks/useUserAuth";
 const App = () => {
     const {data, isLoading, isError, role} = useUserAuth()
 
-  const isAuthenticated = true
 
   return (
     <TooltipProvider>
