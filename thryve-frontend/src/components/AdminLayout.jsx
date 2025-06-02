@@ -30,26 +30,26 @@ const AdminLayout = () => {
   const getMenuItems = () => {
     if (data?.role === 'specialist') {
       return [
-        { path: '/admin', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
-        // { path: '/admin/dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
-        // { path: '/admin/inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
-        { path: '/admin/plant-care', icon: <Leaf className="h-5 w-5 mr-3" />, label: 'Plant Care Advisory' },
-        // { path: '/admin/reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
+        { path: '/', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
+        // { path: '//dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
+        // { path: '//inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
+        { path: '/plant-care', icon: <Leaf className="h-5 w-5 mr-3" />, label: 'Plant Care Advisory' },
+        // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
       ];
     } else if (data?.role === 'admin') {
       return [
-        { path: '/admin', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
-        { path: '/admin/user-management', icon: <User className="h-5 w-5 mr-3" />, label: 'User Management' },
-        // { path: '/admin/system-config', icon: <Settings className="h-5 w-5 mr-3" />, label: 'System Configuration' },
-        { path: '/admin/access-logs', icon: <AccessLogs className="h-5 w-5 mr-3" />, label: 'Access Logs' },
+        { path: '/', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
+        { path: '/user-management', icon: <User className="h-5 w-5 mr-3" />, label: 'User Management' },
+        // { path: '//system-config', icon: <Settings className="h-5 w-5 mr-3" />, label: 'System Configuration' },
+        { path: '/access-logs', icon: <AccessLogs className="h-5 w-5 mr-3" />, label: 'Access Logs' },
       ];
     } else {
       return [
-        { path: '/admin', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
-        // { path: '/admin/dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
-        // { path: '/admin/inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
-        { path: '/admin/feedback', icon: <MessageSquare className="h-5 w-5 mr-3" />, label: 'Customer Feedback' },
-        // { path: '/admin/reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
+        { path: '/', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
+        // { path: '//dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
+        // { path: '//inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
+        { path: '/feedback', icon: <MessageSquare className="h-5 w-5 mr-3" />, label: 'Customer Feedback' },
+        // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
       ];
     }
   };
