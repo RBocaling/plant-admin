@@ -1,98 +1,139 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { saveAs } from 'file-saver';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, FileText, Calendar, BarChart, PieChart, LineChart } from 'lucide-react';
-import { BarChart as RechartsBarChart, Bar, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {
+  BarChart as RechartsBarChart,
+  Bar,
+  LineChart as RechartsLineChart,
+  Line,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
+
+import { getUserList } from '@/api/userApi';
+import { getPlantAdvisory } from '../api/plantAdvisory';
+import { getFeedbackList } from '../api/feedBack';
 
 const AdminReports = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [reportType, setReportType] = useState('sales');
 
-  // Sample data for the reports
-  const salesData = [
-    { month: 'Jan', sales: 12000 },
-    { month: 'Feb', sales: 10000 },
-    { month: 'Mar', sales: 15000 },
-    { month: 'Apr', sales: 13500 },
-    { month: 'May', sales: 18000 },
-    { month: 'Jun', sales: 16500 },
-  ];
+  const [users, setUsers] = useState([]);
+  const [plantTypes, setPlantTypes] = useState([]);
+  const [trendData, setTrendData] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [plants, setPlants] = useState([]);
 
-  const categoryData = [
-    { name: 'Indoor Plants', value: 55, color: '#4A7C59' },
-    { name: 'Outdoor Plants', value: 30, color: '#8CB369' },
-    { name: 'Succulents', value: 15, color: '#E07A5F' },
-  ];
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const userRes = await getUserList();
+        const userData = userRes.data;
+        setUsers(userData);
 
-  const trendData = [
-    { month: 'Jan', inStore: 4000, online: 2400 },
-    { month: 'Feb', inStore: 3000, online: 1398 },
-    { month: 'Mar', inStore: 5000, online: 3800 },
-    { month: 'Apr', inStore: 4500, online: 4300 },
-    { month: 'May', inStore: 6000, online: 5800 },
-    { month: 'Jun', inStore: 5500, online: 5400 },
-  ];
+        const feedbackRes = await getFeedbackList();
+        const feedbackData = feedbackRes.data;
+        setFeedbacks(feedbackData);
 
-  // Report types
+        const feedbackGrouped = {};
+        feedbackData.forEach((item) => {
+          const date = new Date(item.createdAt || new Date()).toISOString().slice(0, 10);
+          feedbackGrouped[date] = (feedbackGrouped[date] || 0) + 1;
+        });
+
+        const feedbackSorted = Object.entries(feedbackGrouped)
+          .sort(([a], [b]) => new Date(a) - new Date(b))
+          .map(([date, users]) => ({ date, users }));
+
+        setTrendData(feedbackSorted);
+
+        const plantRes = await getPlantAdvisory();
+        const plantData = plantRes.data;
+        setPlants(plantData);
+
+        const typeCount = {};
+        plantData.forEach(p => {
+          typeCount[p.request_type] = (typeCount[p.request_type] || 0) + 1;
+        });
+        const formattedTypes = Object.entries(typeCount).map(([name, value]) => ({
+          name,
+          value,
+          color: '#' + Math.floor(Math.random() * 16777215).toString(16)
+        }));
+        setPlantTypes(formattedTypes);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchAllData();
+  }, []);
+
   const reportTypes = [
-    { id: 'sales', name: 'Sales Report', icon: BarChart },
-    { id: 'category', name: 'Category Distribution', icon: PieChart },
-    { id: 'trend', name: 'Sales Trends', icon: LineChart },
+    { id: 'sales', name: 'User Registrations', icon: BarChart },
+    { id: 'category', name: 'Plant Advisory Categories', icon: PieChart },
+    { id: 'trend', name: 'Feedback Submissions', icon: LineChart },
   ];
 
-  // Function to render the appropriate chart based on report type
+  const getFilteredTrendData = () => {
+    if (!fromDate || !toDate) return trendData;
+    return trendData.filter(d => d.date >= fromDate && d.date <= toDate);
+  };
+
   const renderChart = () => {
+    const filteredData = getFilteredTrendData();
+
+    if (reportType !== 'category' && filteredData.length === 0) {
+      return <p className="text-center text-gray-500 py-10">No data available for the selected date range.</p>;
+    }
+
     switch (reportType) {
       case 'sales':
         return (
           <ResponsiveContainer width="100%" height={400}>
-            <RechartsBarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <RechartsBarChart data={filteredData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`₱${value.toLocaleString()}`, 'Sales']} />
-              <Bar dataKey="sales" fill="#4A7C59" name="Sales" />
+              <XAxis dataKey="date" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="users" fill="#4A7C59" name="New Users" />
             </RechartsBarChart>
           </ResponsiveContainer>
         );
       case 'category':
-        return (
+        return plantTypes.length > 0 ? (
           <ResponsiveContainer width="100%" height={400}>
             <RechartsPieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={150}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {categoryData.map((entry, index) => (
+              <Pie data={plantTypes} cx="50%" cy="50%" outerRadius={150} dataKey="value" label>
+                {plantTypes.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
-              <Legend />
+              <Tooltip />
+              <Legend wrapperStyle={{ marginTop: '20px' }} />
             </RechartsPieChart>
           </ResponsiveContainer>
-        );
+        ) : <p className="text-center text-gray-500 py-10">No data available.</p>;
       case 'trend':
         return (
           <ResponsiveContainer width="100%" height={400}>
-            <RechartsLineChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <RechartsLineChart data={filteredData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`₱${value.toLocaleString()}`, 'Sales']} />
+              <XAxis dataKey="date" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="inStore" stroke="#4A7C59" name="In-Store Sales" />
-              <Line type="monotone" dataKey="online" stroke="#E07A5F" name="Online Sales" />
+              <Line type="monotone" dataKey="users" stroke="#4A7C59" name="Feedbacks" />
             </RechartsLineChart>
           </ResponsiveContainer>
         );
@@ -101,203 +142,123 @@ const AdminReports = () => {
     }
   };
 
-  // Generate report title
   const getReportTitle = () => {
-    const selectedReport = reportTypes.find(r => r.id === reportType);
-    return selectedReport ? selectedReport.name : '';
+    return reportTypes.find(r => r.id === reportType)?.name || '';
   };
 
   const exportToPDF = () => {
-    try {
-      const doc = new jsPDF();
-      const title = getReportTitle();
+    const doc = new jsPDF();
+    const filtered = getFilteredTrendData();
+    doc.setFontSize(16);
+    doc.text(getReportTitle(), 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Date Range: ${fromDate && toDate ? `${fromDate} - ${toDate}` : 'All Time'}`, 14, 25);
 
-      // Add title
-      doc.setFontSize(16);
-      doc.text(title, 14, 15);
-
-      // Add date range
-      doc.setFontSize(10);
-      doc.text(
-        `Date Range: ${fromDate && toDate ? `${fromDate} - ${toDate}` : 'Last 6 months'}`,
-        14, 25
-      );
-
-      const tableConfig = {
-        startY: 30,
-        head: [],
-        body: [],
-      };
-
-      // Add table data based on report type
-      if (reportType === 'sales') {
-      tableConfig.head = [['Month', 'Sales']];
-      tableConfig.body = salesData.map(item => [
-        item.month,
-        `₱${item.sales.toLocaleString()}`
-      ]);
-    } else if (reportType === 'category') {
-      tableConfig.head = [['Category', 'Percentage']];
-      tableConfig.body = categoryData.map(item => [
-        item.name,
-        `${item.value}%`
-      ]);
-    } else if (reportType === 'trend') {
-      tableConfig.head = [['Month', 'In-Store Sales', 'Online Sales']];
-      tableConfig.body = trendData.map(item => [
-        item.month,
-        `₱${item.inStore.toLocaleString()}`,
-        `₱${item.online.toLocaleString()}`
-      ]);
+    if ((reportType !== 'category' && filtered.length === 0) || (reportType === 'category' && plantTypes.length === 0)) {
+      alert('No data available to export.');
+      return;
     }
 
-    // Generate table
-    autoTable(doc, tableConfig);
-
-      // Save the PDF
-      doc.save(`${title.toLowerCase().replace(' ', '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please check console for details.');
-    }
-  };
-
-  const exportToCSV = () => {
-    let csvContent = '';
-    const title = getReportTitle();
-
-    // Create CSV content based on report type
+    let body = [];
     if (reportType === 'sales') {
-      csvContent = 'Month,Sales\n';
-      csvContent += salesData.map(item =>
-        `${item.month},${item.sales}`
-      ).join('\n');
-    } else if (reportType === 'category') {
-      csvContent = 'Category,Percentage\n';
-      csvContent += categoryData.map(item =>
-        `${item.name},${item.value}`
-      ).join('\n');
+      body = users.map(item => [
+        new Date(item.createdAt).toLocaleDateString(),
+        `${item.firstName} ${item.lastName}`,
+        item.email,
+        item.role
+      ]);
+      autoTable(doc, {
+        startY: 30,
+        head: [['Date Registered', 'Full Name', 'Email', 'Role']],
+        body,
+        headStyles: { fillColor: [74, 124, 89] }
+      });
     } else if (reportType === 'trend') {
-      csvContent = 'Month,In-Store Sales,Online Sales\n';
-      csvContent += trendData.map(item =>
-        `${item.month},${item.inStore},${item.online}`
-      ).join('\n');
+      body = feedbacks.map(f => [
+        f.rating,
+        f.description || 'N/A',
+        new Date(f.createdAt).toLocaleString(),
+        f.status,
+        f.response || 'No Response',
+        `${f.user.firstName} ${f.user.lastName}`,
+        f.user.email
+      ]);
+      autoTable(doc, {
+        startY: 30,
+        head: [['Rating', 'Description', 'Date & Time', 'Status', 'Response', 'User Name', 'User Email']],
+        body,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [74, 124, 89] }
+      });
+    } else if (reportType === 'category') {
+      body = plants.map(p => [
+        p.plant_name,
+        p.request_type,
+        p.response || 'No Response',
+        p.status,
+        `${p.user.firstName} ${p.user.lastName}`,
+        p.user.email
+      ]);
+      autoTable(doc, {
+        startY: 30,
+        head: [['Plant Name', 'Request Type', 'Response', 'Status', 'User Name', 'User Email']],
+        body,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [74, 124, 89] }
+      });
     }
 
-    // Create and save the file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
-    saveAs(blob, `${title.toLowerCase().replace(' ', '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+    doc.save(`${getReportTitle().toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   return (
-    <div>
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Reports Generation</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90" onClick={exportToPDF}>
-            Export to PDF
-            <Download className="ml-2 h-4 w-4" />
-          </Button>
-          <Button variant="outline" className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90" onClick={exportToCSV}>
-            Export to CSV
-            <Download className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+        <Button onClick={exportToPDF} className="bg-[#4A7C59] text-white">Export to PDF <Download className="ml-2 w-4 h-4" /></Button>
       </div>
 
-      {/* Report Filters */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
-            <div className="flex flex-col space-y-2">
-              {reportTypes.map((type) => (
-                <div
-                  key={type.id}
-                  className={`flex items-center p-3 rounded-lg cursor-pointer border ${reportType === type.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                  onClick={() => setReportType(type.id)}
-                >
-                  <type.icon className={`mr-3 ${reportType === type.id ? 'text-primary' : 'text-gray-400'}`} />
-                  <span className={reportType === type.id ? 'font-semibold text-primary' : 'text-gray-600'}>
-                    {type.name}
-                  </span>
-                </div>
-              ))}
-            </div>
+      <div className="grid md:grid-cols-3 gap-6 bg-white p-6 rounded shadow">
+        {reportTypes.map(type => (
+          <div
+            key={type.id}
+            onClick={() => setReportType(type.id)}
+            className={`flex items-center cursor-pointer border p-3 rounded-lg ${reportType === type.id ? 'bg-[#4A7C59]/10 border-[#4A7C59]' : 'hover:bg-gray-50'}`}
+          >
+            <type.icon className={`mr-3 ${reportType === type.id ? 'text-[#4A7C59]' : 'text-gray-500'}`} />
+            <span className={`font-medium ${reportType === type.id ? 'text-[#4A7C59]' : ''}`}>{type.name}</span>
           </div>
+        ))}
+      </div>
 
-          <div className="col-span-1 md:col-span-2 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                    <Input
-                      type="date"
-                      placeholder="From Date"
-                      value={fromDate}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                    <Input
-                      type="date"
-                      placeholder="To Date"
-                      value={toDate}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Button variant="default" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white">
-                Generate Report
-              </Button>
-            </div>
+      <div className="grid md:grid-cols-2 gap-6 mt-6 bg-white p-6 rounded shadow">
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">From Date</label>
+          <div className="relative">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+            <Input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="pl-10" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">To Date</label>
+          <div className="relative">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+            <Input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="pl-10" />
           </div>
         </div>
       </div>
 
-      {/* Report Display */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white mt-6 p-6 rounded shadow">
+        <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
-            <FileText className="mr-2 text-primary" size={24} />
+            <FileText className="mr-2 text-[#4A7C59]" />
             <h2 className="text-xl font-semibold">{getReportTitle()}</h2>
           </div>
           <p className="text-sm text-gray-500">
-            {fromDate && toDate ? `${fromDate} - ${toDate}` : 'Last 6 months'}
+            {fromDate && toDate ? `${fromDate} - ${toDate}` : 'All Time'}
           </p>
         </div>
-
-        <div className="mb-6">
-          {renderChart()}
-        </div>
-
-        {/* Report Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-500">Total Sales</p>
-            <p className="text-2xl font-bold">₱85,000.00</p>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-500">Average Monthly Sales</p>
-            <p className="text-2xl font-bold">₱14,166.67</p>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-500">Most Profitable Month</p>
-            <p className="text-2xl font-bold">May</p>
-          </div>
-        </div>
+        {renderChart()}
       </div>
     </div>
   );

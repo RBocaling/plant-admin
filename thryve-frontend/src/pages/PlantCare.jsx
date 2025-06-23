@@ -6,17 +6,19 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useGetAdvisory from '../hooks/useGetAdvisory';
-import { format } from 'date-fns';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { submitSpecialistResponse } from '../api/plantAdvisory';
 import { toast } from 'sonner';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 const PlantCare = () => {
   // Sample plant care advisory data
   const { data, isLoading } = useGetAdvisory();
 
   console.log("advisory",);
-  const advisoryItems =  data?.map((i) => {
+  const advisoryItems = data?.map((i) => {
     const customer = i?.user;
     return {
       id: i?.id,
@@ -24,14 +26,56 @@ const PlantCare = () => {
       requestType: i?.request_type,
       customer: `${customer?.firstName} ${customer?.lastName}`,
       email: customer?.email,
-      date: format(new Date(i?.createdAt), "MMM dd, yyyy"),
-      description: i?.description,      status: i?.status,
+      createdAt: i?.createdAt,
+      description: i?.description,
+      date: i?.createdAt ? new Date(i?.createdAt).toLocaleDateString() : '-',
       status: i?.status,
       priority: i?.priority,
       response: i?.response
-    }
-  }) ?? []
-  
+    };
+  }) ?? [];
+
+ const exportToPDF = () => {
+  if (!advisoryItems || advisoryItems.length === 0) {
+    toast.warning("No advisory data available to export.");
+    return;
+  }
+
+  const doc = new jsPDF();
+  doc.setFontSize(12);
+  doc.text("Plant Advisory Report", 14, 20);
+
+  const tableColumn = [
+    "Plant Name",
+    "Type",
+    "Status",
+    "Priority",
+    "Customer",
+    "Email",
+    "Created Date",
+    "Response"
+  ];
+
+  const tableRows = advisoryItems.map((item) => [
+    item.plantName || "-",
+    item.requestType || "-",
+    item.status || "-",
+    item.priority || "-",
+    item.customer || "-",
+    item.email || "-",
+    item.date || "-",
+    item.response || "-"
+  ]);
+
+  autoTable(doc, {
+    startY: 30,
+    head: [tableColumn],
+    body: tableRows,
+    headStyles: { fillColor: [74, 124, 89] }
+  });
+
+  doc.save("plant-advisory-report.pdf");
+};
   // const [advisoryItems, setAdvisoryItems] = useState(advisory || []);
 
   // Sample care guides for the Knowledge Base
@@ -131,24 +175,30 @@ const PlantCare = () => {
   const handleSubmitResponse = () => {
     if (!selectedAdvisory) return;
     
+    if (selectedAdvisory.status === 'RESOLVED') {
+    toast.warning("This advisory has already been resolved. You cannot submit a new response.");
+    return;
+     }
+
     responseAdvisory({id:selectedAdvisory?.id, response:responseText || ""})
-    // const updatedAdvisory = advisoryItems.map(item => {
-    //   if (item.id === selectedAdvisory.id) {
-    //     return {
-    //       ...item,
-    //       status: 'Resolved',
-    //       response: responseText
-    //     };
-    //   }
-    //   return item;
-    // });
+    const updatedAdvisory = advisoryItems.map(item => {
+      if (item.id === selectedAdvisory.id) {
+        return {
+          ...item,
+          response: responseText
+        };
+      }
+      return item;
+    });
     
     console.log("test", selectedAdvisory);
     
-    // setAdvisoryItems(updatedAdvisory);
-    // setSelectedAdvisory(null);
-    // setResponseText('');
+    setAdvisoryItems(updatedAdvisory);
+    setSelectedAdvisory(null);
+    setResponseText('');
   };
+
+  
 
   // Status color mapping
   const getStatusColor = (status) => {
@@ -176,13 +226,17 @@ const PlantCare = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Plant Care Advisory</h1>
         <div className="flex gap-2">
-          <Button variant="outline" className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90">
-            Export Data
-            <Download className="ml-2 h-4 w-4" />
-          </Button>
+       <Button
+          variant="outline"
+          className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90"
+          onClick={exportToPDF}
+        >
+          Export Data
+          <Download className="ml-2 h-4 w-4" />
+        </Button>
         </div>
       </div>
 
@@ -362,24 +416,27 @@ const PlantCare = () => {
                       />
                     </div>
                     
-                    <div className="flex justify-end space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setSelectedAdvisory(null)}
-                      >
-                        <X size={16} className="mr-1" />
-                        Cancel
-                      </Button>
-                      <Button 
-                        size="sm"
-                        onClick={handleSubmitResponse}
-                        disabled={!responseText.trim()}
-                      >
-                        <Check size={16} className="mr-1" />
-                        Submit Advice
-                      </Button>
-                    </div>
+           <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setSelectedAdvisory(null)}
+              className="w-full sm:w-auto flex items-center text-red-500 hover:bg-red-600 justify-center"
+            >
+              <X size={16} className="mr-2 " />
+              Cancel
+            </Button>
+            <Button 
+              size="sm"
+              onClick={handleSubmitResponse}
+              disabled={!responseText.trim()}
+              className="w-full sm:w-auto flex items-center justify-center bg-white text-[#4A7C59] disabled:opacity-60"
+            >
+              <Check size={16} className="mr-2" />
+              Submit Advice
+            </Button>
+          </div>
+
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
@@ -398,7 +455,7 @@ const PlantCare = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Pending Requests</span>
-                    <span className="font-medium">{advisoryItems?.filter(item => item.status !== 'Resolved').length}</span>
+                    <span className="font-medium">{advisoryItems?.filter(item => item.status === 'OPEN').length}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">High Priority Requests</span>
@@ -426,11 +483,11 @@ const PlantCare = () => {
               </div>
             ))}
             
-            <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm p-4 flex items-center justify-center">
+            {/* <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm p-4 flex items-center justify-center">
               <Button variant="outline">
                 + Create New Care Guide
               </Button>
-            </div>
+            </div> */}
           </div>
         </TabsContent>
       </Tabs>

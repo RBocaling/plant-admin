@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 
-const baseURL = "https://plant-api-v2.onrender.com/api"
-
+// const baseURL = "https://plant-api-v2.onrender.com/api"
+const baseURL = "http://localhost:5000/api"
 const api = axios.create({
   baseURL,
 });

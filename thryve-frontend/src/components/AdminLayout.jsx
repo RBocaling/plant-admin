@@ -42,6 +42,7 @@ const AdminLayout = () => {
         { path: '/user-management', icon: <User className="h-5 w-5 mr-3" />, label: 'User Management' },
         // { path: '//system-config', icon: <Settings className="h-5 w-5 mr-3" />, label: 'System Configuration' },
         { path: '/access-logs', icon: <AccessLogs className="h-5 w-5 mr-3" />, label: 'Access Logs' },
+        { path: '/reports', icon: <AccessLogs className="h-5 w-5 mr-3" />, label: 'Reports' },
       ];
     } else {
       return [

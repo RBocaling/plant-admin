@@ -10,6 +10,7 @@ import useGetAdvisory from '../hooks/useGetAdvisory';
 import useGetPlant from '../hooks/useGetPlant';
 import useGetUserInfo from '../hooks/useGetUserInfo';
 import useUserAuth from '../hooks/useUserAuth';
+import Analytics from './Analytics';
 
 const AdminOverview = () => {
   const [timeRange, setTimeRange] = useState('This Week');

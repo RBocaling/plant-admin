@@ -125,9 +125,12 @@ const UserManagement = () => {
   });
 
   const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-    toast.success('User deleted successfully');
-  };
+  const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+  if (!confirmDelete) return;
+
+  setUsers(users.filter((user) => user.id !== id));
+  toast.success('User deleted successfully');
+};
 
   const handleEdit = (user) => {
     setSelectedUser(user);
@@ -205,7 +208,7 @@ const UserManagement = () => {
 
       {/* Add User Form */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold mb-4">Create Admin Account</h2>
+        <h2 className="text-xl font-bold mb-4">Create Account</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <Label htmlFor="role">Role</Label>
@@ -252,7 +255,7 @@ const UserManagement = () => {
             className="bg-primary text-white"
             disabled={isAdding}
           >
-            {isAdding ? 'Adding...' : 'Add'}
+            {isAdding ? 'Adding...' : 'Save'}
           </Button>
         </div>
       </div>
