@@ -1,40 +1,27 @@
-import { useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Search, 
-  Filter, 
-  MessageSquare, 
-  Star, 
-  Check, 
-  X, 
+import {
+  Search,
+  Filter,
+  MessageSquare,
+  Star,
+  Check,
+  X,
   ArrowUpDown,
-  Download
+  Download,
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import useGetFeedBack from '../hooks/useGetFeedBack';
 import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'; 
 
 const Feedback = () => {
-
-
-  const { data, isLoading } = useGetFeedBack();
-
-  const feedBack = data?.map((i) => {
-    const customer = i?.user;
-
-    return {
-       id: i?.id,
-      customer: `${customer?.firstName} ${customer?.lastName}`,
-      email: customer?.email,
-      date: format(new Date(i?.createdAt), "MMM dd, yyyy"),
-      message: i?.description,
-      rating: i?.rating,
-      status: i?.status,
-      response: i?.response
-    }
-  })
-  const [feedbackItems, setFeedbackItems] = useState(feedBack || []);
+  const { data } = useGetFeedBack();
+  const [feedbackItems, setFeedbackItems] = useState([]);
 
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -42,17 +29,34 @@ const Feedback = () => {
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [responseText, setResponseText] = useState('');
-  
-  // Filter feedback based on search term and status filter
-  const filteredFeedback = feedbackItems.filter(item => {
-    const matchesSearch = 
-      item.customer.toLowerCase().includes(search.toLowerCase()) || 
+
+  useEffect(() => {
+    if (data) {
+      const mapped = data.map((i) => {
+        const customer = i?.user;
+        return {
+          id: i?.id,
+          customer: `${customer?.firstName} ${customer?.lastName}`,
+          email: customer?.email,
+          date: format(new Date(i?.createdAt), 'MMM dd, yyyy'),
+          message: i?.description,
+          rating: i?.rating,
+          status: i?.status,
+          response: i?.response,
+        };
+      });
+      setFeedbackItems(mapped);
+    }
+  }, [data]);
+
+  const filteredFeedback = feedbackItems.filter((item) => {
+    const matchesSearch =
+      item.customer.toLowerCase().includes(search.toLowerCase()) ||
       item.message.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = filterStatus ? item.status === filterStatus : true;
     return matchesSearch && matchesStatus;
   });
 
-  // Sort feedback based on sort field and direction
   const sortedFeedback = [...filteredFeedback].sort((a, b) => {
     if (sortDirection === 'asc') {
       return a[sortField] > b[sortField] ? 1 : -1;
@@ -61,7 +65,6 @@ const Feedback = () => {
     }
   });
 
-  // Handle sorting when clicking on column header
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -71,40 +74,57 @@ const Feedback = () => {
     }
   };
 
-  // Handle selecting a feedback item for response
   const handleSelectFeedback = (feedback) => {
     setSelectedFeedback(feedback);
     setResponseText(feedback.response || '');
   };
 
-  // Handle submitting a response to feedback
-  const handleSubmitResponse = () => {
-    if (!selectedFeedback) return;
-    
-    const updatedFeedback = feedbackItems.map(item => {
-      if (item.id === selectedFeedback.id) {
-        return {
-          ...item,
-          status: 'Resolved',
-          response: responseText
-        };
-      }
-      return item;
-    });
-    
-    setFeedbackItems(updatedFeedback);
-    setSelectedFeedback(null);
-    setResponseText('');
-  };
+const handleExport = () => {
+  if (!feedbackItems.length) {
+    alert('No feedback to export.');
+    return;
+  }
 
-  // Status color mapping
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text('Customer Feedback Report', 14, 20);
+
+  const headers = [['Customer', 'Email', 'Date', 'Rating', 'Status', 'Message']];
+
+  const data = feedbackItems.map((item) => [
+    item.customer,
+    item.email,
+    item.date,
+    item.rating.toString(),
+    item.status,
+    item.message ?? '',
+  ]);
+
+  autoTable(doc, {
+    startY: 30,
+    head: headers,
+    body: data,
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [74, 124, 89] }, 
+  });
+
+  doc.save('feedback_report.pdf');
+};
+
+
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Open': return 'bg-blue-100 text-blue-800';
-      case 'In Progress': return 'bg-yellow-100 text-yellow-800';
-      case 'Resolved': return 'bg-green-100 text-green-800';
-      case 'Urgent': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Open':
+        return 'bg-blue-100 text-blue-800';
+      case 'In Progress':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Resolved':
+        return 'bg-green-100 text-green-800';
+      case 'Urgent':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -113,14 +133,18 @@ const Feedback = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Customer Feedback</h1>
         <div className="flex gap-2">
-          <Button variant="outline" className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90">
+          <Button
+            variant="outline"
+            className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90"
+            onClick={handleExport}
+          >
             Export Feedback
             <Download className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {/* Search and Filter Section */}
+      {/* Search and Filter */}
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="relative w-full md:w-80">
@@ -133,14 +157,13 @@ const Feedback = () => {
               className="pl-10"
             />
           </div>
-
           <div className="flex gap-3 items-center">
             <div className="flex items-center">
               <Filter className="mr-2 text-gray-500" size={18} />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                className="border border-gray-300 rounded-md p-2"
               >
                 <option value="">All Status</option>
                 <option value="Open">Open</option>
@@ -153,8 +176,8 @@ const Feedback = () => {
         </div>
       </div>
 
+      {/* Feedback Table */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Feedback List */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
@@ -193,25 +216,21 @@ const Feedback = () => {
                     sortedFeedback.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium">{item.customer}</p>
-                            <p className="text-sm text-gray-500">{item.email}</p>
-                          </div>
+                          <p className="font-medium">{item.customer}</p>
+                          <p className="text-sm text-gray-500">{item.email}</p>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                size={16} 
-                                className={i < item.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+                              <Star
+                                key={i}
+                                size={16}
+                                className={i < item.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
                               />
                             ))}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm">
-                          {new Date(item.date).toLocaleDateString()}
-                        </td>
+                        <td className="px-4 py-3 text-sm">{item.date}</td>
                         <td className="px-4 py-3">
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}`}
@@ -220,11 +239,7 @@ const Feedback = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleSelectFeedback(item)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleSelectFeedback(item)}>
                             <MessageSquare size={16} className="mr-1" />
                             View
                           </Button>
@@ -234,7 +249,7 @@ const Feedback = () => {
                   ) : (
                     <tr>
                       <td colSpan={5} className="px-4 py-3 text-center text-gray-500">
-                        No feedback found matching your criteria
+                        No feedback found
                       </td>
                     </tr>
                   )}
@@ -244,59 +259,33 @@ const Feedback = () => {
           </div>
         </div>
 
-        {/* Feedback Response Panel */}
+        {/* Response Panel */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-sm p-4">
             <h2 className="text-lg font-semibold mb-4">
               {selectedFeedback ? 'Respond to Feedback' : 'Select Feedback'}
             </h2>
-            
             {selectedFeedback ? (
               <div className="space-y-4">
                 <div className="bg-gray-50 p-3 rounded-md">
                   <p className="font-medium">{selectedFeedback.customer}</p>
-                  <p className="text-sm text-gray-500 mb-2">{new Date(selectedFeedback.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-500 mb-2">{selectedFeedback.date}</p>
                   <div className="flex mb-2">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={16} 
-                        className={i < selectedFeedback.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+                      <Star
+                        key={i}
+                        size={16}
+                        className={i < selectedFeedback.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
                       />
                     ))}
                   </div>
                   <p className="text-gray-700">{selectedFeedback.message}</p>
                 </div>
-                
-                {/* <div>
-                  <label className="block mb-1 font-medium text-sm">Your Response</label>
-                  <Textarea 
-                    placeholder="Type your response here..." 
-                    value={responseText}
-                    onChange={(e) => setResponseText(e.target.value)}
-                    rows={5}
-                    className="w-full"
-                  />
-                </div> */}
-                
                 <div className="flex justify-start space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedFeedback(null)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setSelectedFeedback(null)}>
                     <X size={16} className="mr-1 text-red-500" />
                     Close
                   </Button>
-                  {/* <Button 
-                    size="sm"
-                    onClick={handleSubmitResponse}
-                    disabled={!responseText.trim()}
-                    className="text-white bg-[#4A7C59] hover:bg-[#4A7C59]/90"
-                  >
-                    <Check size={16} className="mr-1" />
-                    Submit Response
-                  </Button> */}
                 </div>
               </div>
             ) : (
@@ -306,7 +295,8 @@ const Feedback = () => {
               </div>
             )}
           </div>
-          
+
+          {/* Stats */}
           <div className="bg-white rounded-lg shadow-sm p-4 mt-6">
             <h3 className="font-medium mb-2">Feedback Statistics</h3>
             <div className="space-y-2">
@@ -317,12 +307,12 @@ const Feedback = () => {
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Average Rating</span>
                 <span className="font-medium">
-                  {(feedbackItems.reduce((acc, item) => acc + item.rating, 0) / feedbackItems.length).toFixed(1)} / 5
+                  {(feedbackItems.reduce((acc, item) => acc + item.rating, 0) / feedbackItems.length || 0).toFixed(1)} / 5
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Pending Responses</span>
-                <span className="font-medium">{feedbackItems.filter(item => item.status !== 'Resolved').length}</span>
+                <span className="font-medium">{feedbackItems.filter((i) => i.status !== 'Resolved').length}</span>
               </div>
             </div>
           </div>

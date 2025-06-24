@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
@@ -19,8 +19,12 @@ import Pagination from '@/components/Pagination';
 
 const UserManagement = () => {
   const { data = [], isLoading } = useGetUserList();
-  const [users, setUsers] = useState(data);
-    const queryClient = useQueryClient();
+  const [users, setUsers] = useState([]);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setUsers(data);
+  }, [data]);
 
   const [newUser, setNewUser] = useState({
     firstName: '',
@@ -29,13 +33,12 @@ const UserManagement = () => {
     password: '',
     confirmPassword: '',
     email: '',
-    role: '', // Default empty role
+    role: '',
   });
 
   const [errors, setErrors] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -70,9 +73,8 @@ const UserManagement = () => {
   const { mutateAsync: addAdmin, isPending: isAdding } = useMutation({
     mutationFn: createAdmin,
     onSuccess: () => {
-             queryClient.invalidateQueries({ queryKey: ["get=user"] });
-
-      toast.success('Admin user added successfully')
+      queryClient.invalidateQueries({ queryKey: ['get=user'] });
+      toast.success('Admin user added successfully');
     },
     onError: () => toast.error('Failed to add admin user'),
   });
@@ -92,14 +94,6 @@ const UserManagement = () => {
         role: newUser.role,
       });
 
-      setUsers((prev) => [
-        ...prev,
-        {
-          id: response?.id || `${Date.now()}`,
-          ...newUser,
-        },
-      ]);
-
       setNewUser({
         firstName: '',
         lastName: '',
@@ -117,20 +111,18 @@ const UserManagement = () => {
   const { mutateAsync: updateData } = useMutation({
     mutationFn: editUserApi,
     onSuccess: () => {
-      toast.success('User updated successfully')
-                   queryClient.invalidateQueries({ queryKey: ["get=user"] });
-
+      toast.success('User updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['get=user'] });
     },
     onError: () => toast.error('Update failed'),
   });
 
   const handleDelete = (id) => {
-  const confirmDelete = window.confirm("Are you sure you want to delete this user?");
-  if (!confirmDelete) return;
-
-  setUsers(users.filter((user) => user.id !== id));
-  toast.success('User deleted successfully');
-};
+    const confirmDelete = window.confirm('Are you sure you want to delete this user?');
+    if (!confirmDelete) return;
+    setUsers(users.filter((user) => user.id !== id));
+    toast.success('User deleted successfully');
+  };
 
   const handleEdit = (user) => {
     setSelectedUser(user);
@@ -157,7 +149,6 @@ const UserManagement = () => {
     <div>
       <h1 className="text-3xl font-bold mb-6">User Management</h1>
 
-      {/* Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
         <Table>
           <TableHeader>
@@ -206,7 +197,6 @@ const UserManagement = () => {
         onPageChange={setCurrentPage}
       />
 
-      {/* Add User Form */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold mb-4">Create Account</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -219,7 +209,6 @@ const UserManagement = () => {
               className="w-full border rounded-md p-2"
             >
               <option value="">-- Select Role --</option>
-              {/* <option value="CUSTOMER">CUSTOMER</option> */}
               <option value="ADMIN">ADMIN</option>
               <option value="OWNER">OWNER</option>
               <option value="SPECIALIST">SPECIALIST</option>
@@ -232,12 +221,20 @@ const UserManagement = () => {
             (field) => (
               <div key={field} className={field === 'email' ? 'md:col-span-2' : ''}>
                 <Label htmlFor={field}>
-                  {field === 'confirmPassword' ? 'Confirm Password' : field.charAt(0).toUpperCase() + field.slice(1)}
+                  {field === 'confirmPassword'
+                    ? 'Confirm Password'
+                    : field.charAt(0).toUpperCase() + field.slice(1)}
                 </Label>
                 <Input
                   id={field}
                   name={field}
-                  type={field.includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
+                  type={
+                    field.includes('password')
+                      ? 'password'
+                      : field === 'email'
+                      ? 'email'
+                      : 'text'
+                  }
                   value={newUser[field]}
                   onChange={handleInputChange}
                   className={errors[field] ? 'border-red-500' : ''}
@@ -260,7 +257,6 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Edit Modal */}
       {isModalOpen && selectedUser && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">

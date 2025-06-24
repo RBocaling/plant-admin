@@ -9,12 +9,16 @@ const AccessLogs = () => {
     const { data: activityLogData, isLoading: activityLoading } = useGetActivityLogs();
   // { id: 1, userId: 22, username: 'Admin', activity: 'User logged in', timestamp: '2025-05-30T17:37:11.350Z' }
   
-  const customData = activityLogData?.map((i) => ({
+ const customData = activityLogData
+  ?.slice() // to avoid mutating original data
+  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // sort descending
+  .map((i) => ({
     id: i?.userId || "",
     username: i?.username,
     dateTime: format(new Date(i?.timestamp), "MMMM d, yyyy 'at' h:mm a"),
     activity: i?.activity,
-  }))
+  }));
+
   // const [logs, setLogs] = useState(customData);
 
   // const handleDelete = (id) => {
@@ -35,7 +39,7 @@ const AccessLogs = () => {
               <TableHead>Username</TableHead>
               <TableHead>Date/Time</TableHead>
               <TableHead>Activity</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              {/* <TableHead className="text-right">Action</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -45,7 +49,7 @@ const AccessLogs = () => {
                 <TableCell>{log.username}</TableCell>
                 <TableCell>{log.dateTime}</TableCell>
                 <TableCell>{log.activity}</TableCell>
-                <TableCell className="text-right">
+                {/* <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <button className="p-1 text-gray-500 hover:text-primary">
                       <Pencil size={18} />
@@ -57,7 +61,7 @@ const AccessLogs = () => {
                       <Trash size={18} />
                     </button>
                   </div>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

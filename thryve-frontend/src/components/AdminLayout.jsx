@@ -3,6 +3,8 @@ import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import { FileText, Grid2x2, PackageSearch, BarChart3, Bell, Search, LogOut, HelpCircle, Menu, X, MessageSquare, Leaf, User, Settings, FileText as AccessLogs } from 'lucide-react';
 import ThryveLogoWhite from '../assets/Thryve Logo White.png';
 import useUserAuth from '../hooks/useUserAuth';
+
+
 const AdminLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [userRole, setUserRole] = useState('');
@@ -50,7 +52,8 @@ const AdminLayout = () => {
         // { path: '//dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
         // { path: '//inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
         { path: '/feedback', icon: <MessageSquare className="h-5 w-5 mr-3" />, label: 'Customer Feedback' },
-        // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
+        { path: '/plant-cms', icon: <Leaf className="h-5 w-5 mr-3" />, label: 'Plant CMS' },
+
       ];
     }
   };
@@ -121,19 +124,19 @@ const AdminLayout = () => {
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-            <input
+            {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} /> */}
+            {/* <input
               type="text"
               placeholder="Search"
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+            /> */}
           </div>
           <div className="flex items-center space-x-4">
             <button className="p-2 rounded-full hover:bg-gray-100">
               <Bell size={20} />
             </button>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              {/* <div className="w-8 h-8 bg-gray-200 rounded-full"></div> */}
               <span className="ml-2 text-gray-800">
                 {data?.role === 'specialist' ? 'Plant Specialist' :
                   data?.role === 'owner' ? 'Plant Store Owner' :

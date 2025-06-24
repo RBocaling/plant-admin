@@ -1,16 +1,14 @@
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 
-// const baseURL = "https://plant-api-v2.onrender.com/api"
-const baseURL = "http://localhost:5000/api"
+export const baseURL = "http://localhost:5000/api";
+
 const api = axios.create({
   baseURL,
 });
 
 api.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
-  console.log("accessToken", accessToken);
-  
   if (accessToken && config.headers) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -20,11 +18,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config ;
+    const originalRequest = error.config;
+    const { refreshToken, setTokens, clearTokens } = useAuthStore.getState();
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const { refreshToken, setTokens, clearTokens } = useAuthStore.getState();
 
       if (!refreshToken) {
         clearTokens();
@@ -32,12 +30,9 @@ api.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post<RefreshTokenResponse>(
-          `${baseURL}/auth/refresh-token`,
-          { refreshToken }
-        );
-
+        const res = await axios.post(`${baseURL}/auth/refresh-token`, { refreshToken });
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = res.data;
+
         setTokens(newAccessToken, newRefreshToken);
 
         if (originalRequest.headers) {
