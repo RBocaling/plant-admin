@@ -3,7 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Routes, Route } from "react-router-dom";
 
 // Pages
-import HomePage from "./pages/Home";
+import Shop from "./pages/Shop";
 import PlantStore from "./pages/PlantStore";
 import AboutUs from "./pages/AboutUs";
 import FAQs from "./pages/FAQs";
@@ -57,13 +57,16 @@ const App = () => {
             <Route path="user-management" element={<UserManagement />} />
             <Route path="system-config" element={<SystemConfig />} />
             <Route path="access-logs" element={<AccessLogs />} />
+
+            {/* new */}
+            <Route path="/shop-items" element={<Shop />} />
           </Route>
 
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <Toaster position="top-center"/>
+      <Toaster position="top-center" />
     </TooltipProvider>
   );
 };
