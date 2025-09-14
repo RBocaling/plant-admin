@@ -57,13 +57,9 @@ const App = () => {
             <Route path="user-management" element={<UserManagement />} />
             <Route path="system-config" element={<SystemConfig />} />
             <Route path="access-logs" element={<AccessLogs />} />
-<<<<<<< HEAD
-            <Route path="plant-cms" element={<PlantCms />} />
-=======
 
             {/* new */}
             <Route path="/shop-items" element={<Shop />} />
->>>>>>> 3c6ba390d13aa339562afc74905f7858485a46f6
           </Route>
 
           {/* 404 Route */}

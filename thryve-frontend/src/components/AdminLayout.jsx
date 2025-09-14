@@ -56,11 +56,6 @@ const AdminLayout = () => {
         },
         // { path: '//dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
         // { path: '//inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
-<<<<<<< HEAD
-        { path: '/feedback', icon: <MessageSquare className="h-5 w-5 mr-3" />, label: 'Customer Feedback' },
-        { path: '/plant-cms', icon: <Leaf className="h-5 w-5 mr-3" />, label: 'Plant CMS' },
-
-=======
         {
           path: "/feedback",
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
@@ -72,7 +67,6 @@ const AdminLayout = () => {
           label: "Shop",
         },
         // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
->>>>>>> 3c6ba390d13aa339562afc74905f7858485a46f6
       ];
     }
   };
