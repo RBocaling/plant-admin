@@ -59,9 +59,14 @@ const AdminLayout = () => {
           label: "Customer Feedback",
         },
         {
-          path: "/shop-items",
+          path: "/explore-plants",
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
-          label: "Shop",
+          label: "Shop/Explore Plants",
+        },
+        {
+          path: "/customer-support",
+          icon: <MessageSquare className="h-5 w-5 mr-3" />,
+          label: "Customer Support",
         },
         // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
       ];

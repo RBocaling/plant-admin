@@ -28,6 +28,8 @@ import ScrollToTopButton from "./components/ScrollToTopButton";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminLayout from "./components/AdminLayout";
 import useUserAuth from "./hooks/useUserAuth";
+import ExplorePlant from "./pages/ExplorePlant";
+import AdminContactSupportStatic from "./pages/CustomerSupport";
 
 const App = () => {
     const {data, isLoading, isError, role} = useUserAuth()
@@ -60,6 +62,8 @@ const App = () => {
 
             {/* new */}
             <Route path="/shop-items" element={<Shop />} />
+            <Route path="/explore-plants" element={<ExplorePlant />} />
+            <Route path="/customer-support" element={<AdminContactSupportStatic />} />
           </Route>
 
           {/* 404 Route */}

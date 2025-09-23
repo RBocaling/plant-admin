@@ -20,7 +20,7 @@ export default {
     extend: {
       colors: {
         // Custom brand colors
-        primary: "#4A7C59",
+        primary: "#57d4b1",
         secondary: "#8CB369",
         neutral: "#F4F1DE",
         accent: "#b39969",
@@ -48,8 +48,8 @@ export default {
         },
       },
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif'],
-        'inter': ['Inter', 'sans-serif'],
+        poppins: ["Poppins", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
