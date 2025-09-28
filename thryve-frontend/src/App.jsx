@@ -20,7 +20,7 @@ import PlantCare from "./pages/PlantCare";
 import UserManagement from "./pages/UserManagement";
 import SystemConfig from "./pages/SystemConfig";
 import AccessLogs from "./pages/AccessLogs";
-
+import PlantCms from "./pages/PlantCms";
 // Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";

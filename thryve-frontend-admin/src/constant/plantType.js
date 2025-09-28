@@ -1,0 +1,15 @@
+export const plantTypes =[
+            "All Plants",
+            "Flowering",
+            "Orchids",
+            "Fruit Trees",
+            "Vegetables",
+            "Herbs",
+            "Hanging/Vines",
+            "Pine Trees",
+            "Trees",
+            "Plants",
+            "Bamboo",
+            "Indoor",
+            "Cactus",
+          ]
