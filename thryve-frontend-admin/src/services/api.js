@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 
-const baseURL = "http://72.60.199.32:3000/api";
+const baseURL = "https://thryve-plant.site/api";
 // export const baseURL = "http://localhost:5000/api";
 // 
 const api = axios.create({

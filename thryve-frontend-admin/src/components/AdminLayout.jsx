@@ -8,7 +8,6 @@ import { useAuthStore } from '../store/authStore';
 
 const AdminLayout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [userRole, setUserRole] = useState('');
   const navigate = useNavigate();
   // const { isAuthenticated} = useUserAuth()
 
@@ -16,7 +15,6 @@ const AdminLayout = () => {
     const { clearTokens } = useAuthStore();
   
   
-  console.log("data", {role:data?.role,isAuthenticated});
   if (isLoading) return <div>Loading...</div>;
  if (!isAuthenticated) {
       navigate('/login');
