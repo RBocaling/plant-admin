@@ -226,17 +226,17 @@ const PlantCare = () => {
 
   return (
     <div>
-       <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Plant Care Advisory</h1>
         <div className="flex gap-2">
-       <Button
-          variant="outline"
-          className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90"
-          onClick={exportToPDF}
-        >
-          Export Data
-          <Download className="ml-2 h-4 w-4" />
-        </Button>
+          <Button
+            variant="outline"
+            className="bg-[#4A7C59] text-white hover:bg-[#4A7C59]/90"
+            onClick={exportToPDF}
+          >
+            Export Data
+            <Download className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -245,13 +245,16 @@ const PlantCare = () => {
           <TabsTrigger value="requests">Advisory Requests</TabsTrigger>
           <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="requests" className="pt-4">
           {/* Search and Filter Section */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
             <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
               <div className="relative w-full md:w-80">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  size={18}
+                />
                 <Input
                   type="text"
                   placeholder="Search plants, customers, or descriptions..."
@@ -276,7 +279,7 @@ const PlantCare = () => {
                     <option value="URGENT">Urgent</option>
                   </select>
                 </div>
-                
+
                 <div className="flex items-center">
                   <Filter className="mr-2 text-gray-500" size={18} />
                   <select
@@ -302,32 +305,43 @@ const PlantCare = () => {
                   <table className="w-full text-left">
                     <thead className="bg-gray-100">
                       <tr>
-                        <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('plantName')}>
+                        <th
+                          className="px-4 py-3 cursor-pointer"
+                          onClick={() => handleSort("plantName")}
+                        >
                           <div className="flex items-center space-x-1">
                             <span>Plant</span>
                             <ArrowUpDown size={14} />
                           </div>
                         </th>
-                        <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('requestType')}>
+                        <th
+                          className="px-4 py-3 cursor-pointer"
+                          onClick={() => handleSort("requestType")}
+                        >
                           <div className="flex items-center space-x-1">
                             <span>Request Type</span>
                             <ArrowUpDown size={14} />
                           </div>
                         </th>
-                        <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('customer')}>
+                        <th
+                          className="px-4 py-3 cursor-pointer"
+                          onClick={() => handleSort("customer")}
+                        >
                           <div className="flex items-center space-x-1">
                             <span>Customer</span>
                             <ArrowUpDown size={14} />
                           </div>
                         </th>
-                        <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('date')}>
+                        <th
+                          className="px-4 py-3 cursor-pointer"
+                          onClick={() => handleSort("date")}
+                        >
                           <div className="flex items-center space-x-1">
                             <span>Date</span>
                             <ArrowUpDown size={14} />
                           </div>
                         </th>
                         <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">Priority</th>
                         <th className="px-4 py-3 text-center">Actions</th>
                       </tr>
                     </thead>
@@ -335,41 +349,46 @@ const PlantCare = () => {
                       {sortedAdvisory.length > 0 ? (
                         sortedAdvisory.map((item) => (
                           <tr key={item.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 font-medium">{item.plantName}</td>
-                            <td className="px-4 py-3 text-sm">{item.requestType}</td>
-                            <td className="px-4 py-3 text-sm">{item.customer}</td>
+                            <td className="px-4 py-3 font-medium">
+                              {item.plantName}
+                            </td>
+                            <td className="px-4 py-3 text-sm">
+                              {item.requestType}
+                            </td>
+                            <td className="px-4 py-3 text-sm">
+                              {item.customer}
+                            </td>
                             <td className="px-4 py-3 text-sm">
                               {new Date(item.date).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}`}
+                                className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                                  item.status
+                                )}`}
                               >
                                 {item.status}
                               </span>
                             </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(item.priority)}`}
-                              >
-                                {item.priority}
-                              </span>
-                            </td>
+
                             <td className="px-4 py-3 text-center">
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => handleSelectAdvisory(item)}
                               >
                                 <Leaf size={16} className="mr-1" />
-                                {item.response ? 'View' : 'Respond'}
+                                {item.response ? "View" : "Respond"}
                               </Button>
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="px-4 py-3 text-center text-gray-500">
+                          <td
+                            colSpan={7}
+                            className="px-4 py-3 text-center text-gray-500"
+                          >
                             No advisory requests found matching your criteria
                           </td>
                         </tr>
@@ -384,59 +403,69 @@ const PlantCare = () => {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-4">
                 <h2 className="text-lg font-semibold mb-4">
-                  {selectedAdvisory ? 'Provide Care Advice' : 'Select Request'}
+                  {selectedAdvisory ? "Provide Care Advice" : "Select Request"}
                 </h2>
-                
+
                 {selectedAdvisory ? (
                   <div className="space-y-4">
                     <div className="bg-gray-50 p-3 rounded-md">
                       <div className="flex justify-between">
-                        <p className="font-medium">{selectedAdvisory.plantName}</p>
+                        <p className="font-medium">
+                          {selectedAdvisory.plantName}
+                        </p>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(selectedAdvisory.priority)}`}
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityColor(
+                            selectedAdvisory.priority
+                          )}`}
                         >
                           {selectedAdvisory.priority} Priority
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mb-2">
-                        {selectedAdvisory.requestType} • {new Date(selectedAdvisory.date).toLocaleDateString()}
+                        {selectedAdvisory.requestType} •{" "}
+                        {new Date(selectedAdvisory.date).toLocaleDateString()}
                       </p>
-                      <p className="text-sm text-gray-500 mb-2">{selectedAdvisory.customer} ({selectedAdvisory.email})</p>
-                      <p className="text-gray-700 mt-2">{selectedAdvisory.description}</p>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {selectedAdvisory.customer} ({selectedAdvisory.email})
+                      </p>
+                      <p className="text-gray-700 mt-2">
+                        {selectedAdvisory.description}
+                      </p>
                     </div>
-                    
+
                     <div>
-                      <label className="block mb-1 font-medium text-sm">Your Care Advice</label>
-                      <Textarea 
-                        placeholder="Type your care advice here..." 
+                      <label className="block mb-1 font-medium text-sm">
+                        Your Care Advice
+                      </label>
+                      <Textarea
+                        placeholder="Type your care advice here..."
                         value={responseText}
                         onChange={(e) => setResponseText(e.target.value)}
                         rows={8}
                         className="w-full"
                       />
                     </div>
-                    
-           <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 mt-4">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setSelectedAdvisory(null)}
-              className="w-full sm:w-auto flex items-center text-red-500 hover:bg-red-600 justify-center"
-            >
-              <X size={16} className="mr-2 " />
-              Cancel
-            </Button>
-            <Button 
-              size="sm"
-              onClick={handleSubmitResponse}
-              disabled={!responseText.trim()}
-              className="w-full sm:w-auto flex items-center justify-center bg-white text-[#4A7C59] disabled:opacity-60"
-            >
-              <Check size={16} className="mr-2" />
-              Submit Advice
-            </Button>
-          </div>
 
+                    <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedAdvisory(null)}
+                        className="w-full sm:w-auto flex items-center text-red-500 hover:bg-red-600 justify-center"
+                      >
+                        <X size={16} className="mr-2 " />
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleSubmitResponse}
+                        disabled={!responseText.trim()}
+                        className="w-full sm:w-auto flex items-center justify-center bg-white text-[#4A7C59] disabled:opacity-60"
+                      >
+                        <Check size={16} className="mr-2" />
+                        Submit Advice
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
@@ -445,44 +474,71 @@ const PlantCare = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="bg-white rounded-lg shadow-sm p-4 mt-6">
                 <h3 className="font-medium mb-2">Advisory Statistics</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Total Requests</span>
+                    <span className="text-sm text-gray-600">
+                      Total Requests
+                    </span>
                     <span className="font-medium">{advisoryItems?.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Pending Requests</span>
-                    <span className="font-medium">{advisoryItems?.filter(item => item.status === 'OPEN').length}</span>
+                    <span className="text-sm text-gray-600">
+                      Pending Requests
+                    </span>
+                    <span className="font-medium">
+                      {
+                        advisoryItems?.filter((item) => item.status === "OPEN")
+                          .length
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">High Priority Requests</span>
-                    <span className="font-medium">{advisoryItems?.filter(item => item.priority === 'High').length}</span>
+                    <span className="text-sm text-gray-600">
+                      High Priority Requests
+                    </span>
+                    <span className="font-medium">
+                      {
+                        advisoryItems?.filter(
+                          (item) => item.priority === "High"
+                        ).length
+                      }
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="knowledge" className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {careGuides.map(guide => (
-              <div key={guide.id} className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+            {careGuides.map((guide) => (
+              <div
+                key={guide.id}
+                className="bg-white rounded-lg shadow-sm p-4 border border-gray-100"
+              >
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold text-lg">{guide.title}</h3>
-                  <Badge variant="outline" className="bg-green-50">{guide.category}</Badge>
+                  <Badge variant="outline" className="bg-green-50">
+                    {guide.category}
+                  </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">By {guide.author} • {new Date(guide.date).toLocaleDateString()}</p>
+                <p className="text-sm text-gray-600 mt-2">
+                  By {guide.author} •{" "}
+                  {new Date(guide.date).toLocaleDateString()}
+                </p>
                 <p className="mt-3 text-gray-700">{guide.excerpt}</p>
                 <div className="mt-4">
-                  <Button variant="outline" size="sm">View Full Guide</Button>
+                  <Button variant="outline" size="sm">
+                    View Full Guide
+                  </Button>
                 </div>
               </div>
             ))}
-            
+
             {/* <div className="bg-primary/5 border border-primary/20 rounded-lg shadow-sm p-4 flex items-center justify-center">
               <Button variant="outline">
                 + Create New Care Guide

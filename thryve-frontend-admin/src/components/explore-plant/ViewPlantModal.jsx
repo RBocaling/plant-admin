@@ -1,12 +1,30 @@
 import React from 'react';
-import { X, Info, Lightbulb, ShoppingBag, Edit } from 'lucide-react';
+import { X, Info, Lightbulb, ShoppingBag, Edit, Trash } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deletePlantApi } from "../../api/explorePlantApi";
 
 export default function ViewPlantModal({ isOpen, onClose, plant, onEdit }) {
   if (!isOpen || !plant) return null;
 
+  const queryClient = useQueryClient();
   const handleEdit = () => {
     onEdit(plant);
     onClose();
+  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: deletePlantApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["explore-plants"]);
+      alert("Success");
+      onClose();
+    },
+    onError: () => {
+      alert("Errror");
+    },
+  });
+
+  const handleDelete = () => {
+    mutate(plant?.id);
   };
 
   return (
@@ -15,8 +33,12 @@ export default function ViewPlantModal({ isOpen, onClose, plant, onEdit }) {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">{plant.commonName}</h2>
-              <p className="text-sm text-gray-500 italic">{plant.scientificName}</p>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {plant.commonName}
+              </h2>
+              <p className="text-sm text-gray-500 italic">
+                {plant.scientificName}
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -41,15 +63,21 @@ export default function ViewPlantModal({ isOpen, onClose, plant, onEdit }) {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Info className="text-blue-600" size={20} />
-                  <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Description
+                  </h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed">{plant.description}</p>
+                <p className="text-gray-600 leading-relaxed">
+                  {plant.description}
+                </p>
               </div>
 
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Lightbulb className="text-yellow-500" size={20} />
-                  <h3 className="text-lg font-semibold text-gray-800">Fun Fact</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Fun Fact
+                  </h3>
                 </div>
                 <p className="text-gray-600 leading-relaxed">{plant.funFact}</p>
               </div>
@@ -63,13 +91,22 @@ export default function ViewPlantModal({ isOpen, onClose, plant, onEdit }) {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {plant.plantSizes.map((size) => (
-                <div key={size.id} className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 hover:shadow-md transition-all border border-green-100">
+                <div
+                  key={size.id}
+                  className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 hover:shadow-md transition-all border border-green-100"
+                >
                   <div className="text-center">
                     <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3 shadow-sm">
-                      <span className="text-2xl font-bold text-primary">{size.size.charAt(0)}</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {size.size.charAt(0)}
+                      </span>
                     </div>
-                    <h4 className="font-semibold text-gray-800 mb-2">{size.size} Size</h4>
-                    <p className="text-2xl font-bold text-primary">₱{size.price}</p>
+                    <h4 className="font-semibold text-gray-800 mb-2">
+                      {size.size} Size
+                    </h4>
+                    <p className="text-2xl font-bold text-primary">
+                      ₱{size.price}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -85,13 +122,23 @@ export default function ViewPlantModal({ isOpen, onClose, plant, onEdit }) {
             >
               Close
             </button>
-            <button
-              onClick={handleEdit}
-              className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
-            >
-              <Edit size={16} />
-              Edit Plant
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDelete}
+                disabled={isPending}
+                className="flex-1 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                {!isPending && <Trash size={16} />}
+                {isPending ? "Deleting" : "Delete"}
+              </button>
+              <button
+                onClick={handleEdit}
+                className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <Edit size={16} />
+                Edit
+              </button>
+            </div>
           </div>
         </div>
       </div>

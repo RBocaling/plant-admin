@@ -17,3 +17,15 @@ export const getUsserInfo = async () => {
         throw new Error("Invalid Credentials")
     }
 }
+
+export const updateRoleApi = async ({ id, role }) => {
+  try {
+    const response = await api.put("/auth/update-role", {
+      id,
+      role: role?.toUpperCase(),
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || "Failed to update role");
+  }
+};

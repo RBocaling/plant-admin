@@ -32,15 +32,29 @@ clearTokens();
   
   // Menu items based on user role
   const getMenuItems = () => {
-    if (data?.role === 'specialist') {
+    if (data?.role === "specialist") {
       return [
-        { path: '/', icon: <Grid2x2 className="h-5 w-5 mr-3" />, label: 'Overview', end: true },
+        {
+          path: "/",
+          icon: <Grid2x2 className="h-5 w-5 mr-3" />,
+          label: "Overview",
+          end: true,
+        },
         // { path: '//dashboard', icon: <FileText className="h-5 w-5 mr-3" />, label: 'Dashboard' },
         // { path: '//inventory', icon: <PackageSearch className="h-5 w-5 mr-3" />, label: 'Inventory Management' },
-        { path: '/plant-care', icon: <Leaf className="h-5 w-5 mr-3" />, label: 'Plant Care Advisory' },
+        {
+          path: "/plant-care",
+          icon: <Leaf className="h-5 w-5 mr-3" />,
+          label: "Plant Care Advisory",
+        },
+        {
+          path: "/explore-plants",
+          icon: <MessageSquare className="h-5 w-5 mr-3" />,
+          label: "Inventory",
+        },
         // { path: '//reports', icon: <BarChart3 className="h-5 w-5 mr-3" />, label: 'Reports Generation' },
       ];
-    } else if (data?.role === 'admin') {
+    } else if (data?.role === "admin") {
       return [
         {
           path: "/",
@@ -68,11 +82,11 @@ clearTokens();
           icon: <AccessLogs className="h-5 w-5 mr-3" />,
           label: "Reports",
         },
-        {
-          path: "/plant-care",
-          icon: <Leaf className="h-5 w-5 mr-3" />,
-          label: "Plant Care Advisory",
-        },
+        // {
+        //   path: "/plant-care",
+        //   icon: <Leaf className="h-5 w-5 mr-3" />,
+        //   label: "Plant Care Advisory",
+        // },
       ];
     } else {
       return [
@@ -92,12 +106,17 @@ clearTokens();
         {
           path: "/explore-plants",
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
-          label: "Shop/Explore Plants",
+          label: "Inventory",
         },
         {
           path: "/customer-support",
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
           label: "Customer Support",
+        },
+        {
+          path: "/plant-care",
+          icon: <Leaf className="h-5 w-5 mr-3" />,
+          label: "Plant Care Advisory",
         },
         {
           path: "/reports",
@@ -122,8 +141,9 @@ clearTokens();
 
       {/* Sidebar/Drawer */}
       <div
-        className={`bg-[#484848] text-white w-64 fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 md:translate-x-0 ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
-          } shadow-xl`}
+        className={`bg-[#484848] text-white w-64 fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 md:translate-x-0 ${
+          isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+        } shadow-xl`}
       >
         {/* Logo */}
         <div className="flex items-center px-4 py-6">
@@ -133,9 +153,13 @@ clearTokens();
         {/* User Role Badge */}
         <div className="px-6 mb-4">
           <span className="inline-block px-3 py-1 bg-primary text-white text-xs font-semibold rounded-full">
-            {data?.role === 'specialist' ? 'Plant Specialist' :
-              data?.role === 'owner' ? 'Plant Store Owner' :
-                data?.role === 'itadmin' ? 'IT Admin' : 'Admin'}
+            {data?.role === "specialist"
+              ? "Plant Specialist"
+              : data?.role === "owner"
+              ? "Plant Store Owner"
+              : data?.role === "itadmin"
+              ? "IT Admin"
+              : "Admin"}
           </span>
         </div>
 
@@ -148,7 +172,8 @@ clearTokens();
                   to={item.path}
                   end={item.end}
                   className={({ isActive }) =>
-                    `flex items-center px-6 py-3 text-base font-medium hover:bg-black/20 ${isActive ? 'border-l-4 border-secondary bg-black/20' : ''
+                    `flex items-center px-6 py-3 text-base font-medium hover:bg-black/20 ${
+                      isActive ? "border-l-4 border-secondary bg-black/20" : ""
                     }`
                   }
                 >
@@ -170,7 +195,11 @@ clearTokens();
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-margin duration-300 ${isDrawerOpen ? 'md:ml-64' : 'ml-0'} bg-[#f2fceb] overflow-auto`}>
+      <div
+        className={`flex-1 transition-margin duration-300 ${
+          isDrawerOpen ? "md:ml-64" : "ml-0"
+        } bg-[#f2fceb] overflow-auto`}
+      >
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <div className="relative">
@@ -188,9 +217,13 @@ clearTokens();
             <div className="flex items-center">
               {/* <div className="w-8 h-8 bg-gray-200 rounded-full"></div> */}
               <span className="ml-2 text-gray-800">
-                {data?.role === 'specialist' ? 'Plant Specialist' :
-                  data?.role === 'owner' ? 'Plant Store Owner' :
-                    data?.role === 'itadmin' ? 'IT Admin' : 'Admin User'}
+                {data?.role === "specialist"
+                  ? "Plant Specialist"
+                  : data?.role === "owner"
+                  ? "Plant Store Owner"
+                  : data?.role === "itadmin"
+                  ? "IT Admin"
+                  : "Admin User"}
               </span>
             </div>
             <button

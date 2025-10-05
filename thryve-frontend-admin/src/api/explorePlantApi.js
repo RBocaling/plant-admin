@@ -38,3 +38,11 @@ export const updatePlantApi = async (data) => {
     throw new Error("Failed to fetch plant details");
   }
 };
+export const deletePlantApi = async (id) => {
+  try {
+    const response = await api.delete(`/explore-plant/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch plant details");
+  }
+};

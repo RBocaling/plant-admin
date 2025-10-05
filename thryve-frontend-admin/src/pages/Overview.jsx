@@ -26,6 +26,8 @@ const AdminOverview = () => {
   const { data: userData } = useUserAuth();
   
 
+  console.log("historyList", historyList);
+  
 
   
   if (userLoading || feedbackLoading || advisoryLoading || historyLoading) {

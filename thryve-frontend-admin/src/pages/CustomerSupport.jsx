@@ -9,20 +9,32 @@ import {
 export default function AdminContactSupport() {
   const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState(null);
-  const [replyData, setReplyData] = useState({ subject: "", message: "" });
+  const [replyData, setReplyData] = useState({
+    subject: "Response from the Owner",
+    message: "",
+  });
   const [activeSupportId, setActiveSupportId] = useState(null);
 
-  const { data: parents, isLoading } = useQuery({
+  const {
+    data: parents,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["contactSupport"],
     queryFn: getAllContactSupportApi,
   });
 
+  console.log(
+    "ss",
+    parents?.parents?.find((item) => item.id == selectedUser?.id)
+  );
+
   const replyMutation = useMutation({
     mutationFn: replyToContactSupportApi,
     onSuccess: () => {
+      setSelectedUser();
       queryClient.invalidateQueries(["contactSupport"]);
       setReplyData({ subject: "", message: "" });
-      setActiveSupportId(null);
     },
   });
 
@@ -129,9 +141,9 @@ export default function AdminContactSupport() {
                   className="ml-4 mt-2 flex flex-col gap-2"
                 >
                   <input
-                    type="text"
+                    type="hidden"
                     placeholder="Reply Subject"
-                    value={activeSupportId === cs.id ? replyData.subject : ""}
+                    value={"Response from the Owner"}
                     onChange={(e) => {
                       setActiveSupportId(cs.id);
                       setReplyData((prev) => ({

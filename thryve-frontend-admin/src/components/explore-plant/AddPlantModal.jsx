@@ -3,24 +3,12 @@ import { X, Plus, Trash2, Upload, Image, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPlantApi } from "../../api/explorePlantApi";
 import { uploadImageToCloudinary } from "../../lib/uploadImageToCloudinary";
-
-// ✅ Plant types list
-const plantTypes = [
-  "All Plants", // for filtering only, excluded in dropdown
-  "Flowering",
-  "Indoor",
-  "Outdoor",
-  "Succulent",
-  "Herb",
-  "Tree",
-  "Fern",
-  "Cactus",
-];
+import { otherItem, plantTypes } from "../../constant/plantType";
 
 // ✅ Predefined Plant Sizes
 const sizeOptions = ["Small", "Medium", "Large", "Extra Large"];
 
-export default function AddPlantModal({ isOpen, onClose }) {
+export default function AddPlantModal({ isOpen, onClose, type = "plant" }) {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: addPlantApi,
@@ -135,13 +123,17 @@ export default function AddPlantModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  console.log("type", type == "plant" ? plantTypes : otherItem);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">Add New Plant</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Add {type == "plant" ? " Item" : " Other Item"}
+            </h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -167,7 +159,11 @@ export default function AddPlantModal({ isOpen, onClose }) {
                   handleInputChange("commonName", e.target.value)
                 }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                placeholder="e.g., Snake Plant"
+                placeholder={
+                  type == "plant"
+                    ? "e.g., Snake Plant"
+                    : "e.g., Fertilizer Name"
+                }
               />
             </div>
             <div>
@@ -267,7 +263,7 @@ export default function AddPlantModal({ isOpen, onClose }) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white"
             >
               <option value="">Select a type...</option>
-              {plantTypes
+              {(type == "plant" ? plantTypes : otherItem)
                 .filter((type) => type !== "All Plants")
                 .map((type) => (
                   <option key={type} value={type}>
