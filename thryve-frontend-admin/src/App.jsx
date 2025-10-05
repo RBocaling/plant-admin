@@ -29,10 +29,10 @@ import AdminLayout from "./components/AdminLayout";
 import useUserAuth from "./hooks/useUserAuth";
 import ExplorePlant from "./pages/ExplorePlant";
 import AdminContactSupportStatic from "./pages/CustomerSupport";
+import DiseaseManagement from "./pages/DiseaseManagement";
 
 const App = () => {
-    const {data, isLoading, isError, role} = useUserAuth()
-
+  const { data, isLoading, isError, role } = useUserAuth();
 
   return (
     <TooltipProvider>
@@ -62,7 +62,11 @@ const App = () => {
             {/* new */}
             <Route path="/shop-items" element={<Shop />} />
             <Route path="/explore-plants" element={<ExplorePlant />} />
-            <Route path="/customer-support" element={<AdminContactSupportStatic />} />
+            <Route path="/plant-diseases" element={<DiseaseManagement />} />
+            <Route
+              path="/customer-support"
+              element={<AdminContactSupportStatic />}
+            />
           </Route>
 
           {/* 404 Route */}

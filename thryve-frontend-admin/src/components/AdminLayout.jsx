@@ -48,6 +48,11 @@ clearTokens();
           label: "Plant Care Advisory",
         },
         {
+          path: "/plant-diseases",
+          icon: <Leaf className="h-5 w-5 mr-3" />,
+          label: "Plant Diseases",
+        },
+        {
           path: "/explore-plants",
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
           label: "Inventory",
@@ -113,10 +118,15 @@ clearTokens();
           icon: <MessageSquare className="h-5 w-5 mr-3" />,
           label: "Customer Support",
         },
+        // {
+        //   path: "/plant-care",
+        //   icon: <Leaf className="h-5 w-5 mr-3" />,
+        //   label: "Plant Care Advisory",
+        // },
         {
-          path: "/plant-care",
+          path: "/plant-diseases",
           icon: <Leaf className="h-5 w-5 mr-3" />,
-          label: "Plant Care Advisory",
+          label: "Plant Diseases",
         },
         {
           path: "/reports",

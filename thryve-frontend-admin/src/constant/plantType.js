@@ -23,3 +23,11 @@ export const otherItem = [
   "Step Bricks",
   "Pots",
 ];
+
+
+export const diseasesType = [
+  "Fungal Diseases",
+  "Bacterial Diseases",
+  "Viral Diseases",
+  "Specialized / Rare Diseases",
+];
